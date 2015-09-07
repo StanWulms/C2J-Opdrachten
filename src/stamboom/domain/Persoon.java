@@ -37,10 +37,13 @@ public class Persoon {
         //throw new UnsupportedOperationException();
         nr = persNr;
         voornamen = vnamen;
-        achternaam = anaam;
-        tussenvoegsel = tvoegsel;
+        for (int i = 0; i < vnamen.length; i++) {
+            vnamen[i] = ToFirstCap(vnamen[i]);
+        }
+        achternaam = ToFirstCap(anaam);
+        tussenvoegsel = tvoegsel.toLowerCase();
         gebDat = gebdat;
-        gebPlaats = gebplaats;
+        gebPlaats = ToFirstCap(gebplaats);
         geslacht = g;
         this.ouderlijkGezin = ouderlijkGezin;
         alsOuderBetrokkenIn = new ArrayList<>();
@@ -50,6 +53,11 @@ public class Persoon {
     /**
      * @return de achternaam van deze persoon
      */
+    
+    private String ToFirstCap(String input){
+        return input.trim().substring(0,1).toUpperCase() + input.trim().substring(1).toLowerCase();
+    }
+    
     public String getAchternaam() {
         return achternaam;
     }
@@ -275,7 +283,10 @@ public class Persoon {
      * @return true als persoon op datum gescheiden is, anders false
      */
     public boolean isGescheidenOp(Calendar datum) {
-        //todo opgave 1
+        //if(alsOuderBetrokkenIn.stream().anyMatch((g)->g.isHuwelijkOp(datum))) return true;//stream version
+        for(Gezin g : this.alsOuderBetrokkenIn){
+            if(g.isHuwelijkOp(datum))return true;
+        }
         return false;
     }
 

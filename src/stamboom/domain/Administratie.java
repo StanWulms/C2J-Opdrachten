@@ -209,15 +209,17 @@ public class Administratie {
         //zelfde ouders
         if(ouder1 == ouder2) return null;
         if(!ouder1.kanTrouwenOp(huwdatum) || !ouder2.kanTrouwenOp(huwdatum)) return null;
+        if(ouder1.isGetrouwdOp(huwdatum) || ouder2.isGetrouwdOp(huwdatum)) return null;
         
         if(ouder1.heeftOngehuwdGezinMet(ouder2)!=null){
             Gezin huwelijk = ouder1.heeftOngehuwdGezinMet(ouder2);
-            huwelijk.setHuwelijk(huwdatum);
+            if(!huwelijk.setHuwelijk(huwdatum)) return null;
+            
             return huwelijk;
         }
         //no marige
         Gezin gezin = addOngehuwdGezin(ouder1,ouder2);
-        gezin.setHuwelijk(huwdatum);
+        if(!gezin.setHuwelijk(huwdatum)) return null;
         return gezin;
     }
 

@@ -176,7 +176,6 @@ public class Gezin {
             this.scheidingsdatum = null;
             return true;
         }
-        //todo opgave 1
         return false;
     }
 
@@ -187,12 +186,11 @@ public class Gezin {
      * kinderen uit deze relatie (per kind voorafgegaan door ' -')
      */
     public String beschrijving() {
-        //todo opgave 1
         StringBuilder builder = new StringBuilder();
         builder.append(nr).append(" ");
         builder.append(ouder1.getNaam());
         if(ouder2!=null) builder.append(" met ").append(ouder2.getNaam());
-        if(huwelijksdatum!=null) builder.append(" ").append(huwelijksdatum.toString());
+        if(huwelijksdatum!=null) builder.append(" ").append(StringUtilities.datumString(huwelijksdatum));
         if(kinderen.size()>0){
             builder.append("; kinderen:");
             kinderen.stream().forEach((kind) -> {
