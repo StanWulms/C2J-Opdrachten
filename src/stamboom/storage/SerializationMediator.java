@@ -5,8 +5,14 @@
 package stamboom.storage;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import stamboom.domain.Administratie;
 
 public class SerializationMediator implements IStorageMediator {
@@ -23,7 +29,7 @@ public class SerializationMediator implements IStorageMediator {
      * creation of a non configured serialization mediator
      */
     public SerializationMediator() {
-        props = null;
+        props = new Properties();
     }
 
     @Override
@@ -33,7 +39,19 @@ public class SerializationMediator implements IStorageMediator {
         }
         
         // todo opgave 2
-        return null;
+        FileInputStream fileIn = new FileInputStream(props.getProperty("file"));
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        Administratie admin;
+        try {
+            admin = (Administratie)in.readObject();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SerializationMediator.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SerializationMediator.class.getName()).log(Level.SEVERE, "Inproper Object Stored!");
+            return null;//error while reading, inproper object!
+        }
+        in.close();
+        fileIn.close();
+        return admin;
     }
 
     @Override
@@ -41,9 +59,13 @@ public class SerializationMediator implements IStorageMediator {
         if (!isCorrectlyConfigured()) {
             throw new RuntimeException("Serialization mediator isn't initialized correctly.");
         }
-
-        // todo opgave 2
-  
+        //Done Opgave 2
+        
+        FileOutputStream output = new FileOutputStream(props.getProperty("file"));
+        ObjectOutputStream out = new ObjectOutputStream(output);
+        out.writeObject(admin);
+        out.close();
+        output.close();
     }
 
     /**

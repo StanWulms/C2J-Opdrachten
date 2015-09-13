@@ -7,7 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import stamboom.util.StringUtilities;
 
-public class Persoon {
+public class Persoon implements java.io.Serializable {
 
     // ********datavelden**************************************
     private final int nr;
@@ -300,7 +300,14 @@ public class Persoon {
      */
     public int afmetingStamboom() {
         //todo opgave 2
-        return -1;
+        int i = 1;
+        
+        if(ouderlijkGezin!=null){
+            i+=ouderlijkGezin.getOuder1().afmetingStamboom();//ouder 1
+            if(ouderlijkGezin.getOuder2() != null) i += ouderlijkGezin.getOuder2().afmetingStamboom();//eventuele ouder 2
+        }
+                
+        return i;
     }
 
     /**
@@ -316,7 +323,12 @@ public class Persoon {
      * toegewezen;
      */
     void voegJouwStamboomToe(ArrayList<PersoonMetGeneratie> lijst, int g) {
-        //todo opgave 2
+        lijst.add(new PersoonMetGeneratie(toString(),g));
+        if(ouderlijkGezin!=null){
+            ouderlijkGezin.getOuder1().voegJouwStamboomToe(lijst, g+1);//ouder 1
+            if(ouderlijkGezin.getOuder2()!=null)ouderlijkGezin.getOuder2().voegJouwStamboomToe(lijst, g+1);//eventuele ouder 2
+        }
+        
     }
 
     /**
@@ -345,7 +357,12 @@ public class Persoon {
     public String stamboomAlsString() {
         StringBuilder builder = new StringBuilder();
         //todo opgave 2
-
+        ArrayList<PersoonMetGeneratie> tree = new ArrayList<>();
+        voegJouwStamboomToe(tree, 0);
+        for(PersoonMetGeneratie p : tree){
+            for(int i = 0; i < p.getGeneratie(); i++) builder.append("  ");
+            builder.append(p.getPersoonsgegevens()).append(System.lineSeparator());
+        }
         return builder.toString();
     }
 }

@@ -1,5 +1,6 @@
 package stamboom.console;
 
+import java.io.File;
 import stamboom.domain.*;
 import java.util.*;
 import stamboom.util.StringUtilities;
@@ -41,6 +42,18 @@ public class StamboomConsole {
                 case SHOW_GEZIN:
                     toonGezinsgegevens();
                     break;
+                case LOAD_FILE:
+                    loadFile();
+                    break;
+                case SAVE_FILE:
+                    saveFile();
+                    break;
+                case SHOW_TREE:
+                    showTree();
+                    break;
+                case CREATE_PSUEDO:
+                    createPsuedo();
+                    break;
             }
             choice = kiesMenuItem();
         }
@@ -50,6 +63,93 @@ public class StamboomConsole {
         return controller.getAdministratie();
     }
 
+    void createPsuedo(){
+        //from stamboom.domain.StamboomTest.java in test packages
+        Administratie adm = controller.getAdministratie();
+        Persoon piet = adm.addPersoon(Geslacht.MAN, new String[]{"Piet"}, "Swinkels",
+                "", new GregorianCalendar(1924, Calendar.APRIL, 23), "Den Haag", null);
+        Persoon teuntje = adm.addPersoon(Geslacht.VROUW, new String[]{"Teuntje"}, "Vries", "de",
+                new GregorianCalendar(1927, Calendar.MAY, 5), "Doesburg", null);
+        Gezin teuntjeEnPiet = adm.addOngehuwdGezin(teuntje, piet);
+        Persoon gijs = adm.addPersoon(Geslacht.MAN, new String[]{"Gijs", "Jozef"}, "Swinkels",
+                "", new GregorianCalendar(1944, Calendar.APRIL, 21), "Geldrop", teuntjeEnPiet);
+        Persoon ferdinand = adm.addPersoon(Geslacht.MAN, new String[]{"Ferdinand", "Karel", "Helene"}, "Vuiter", "de",
+                new GregorianCalendar(1901, Calendar.JULY, 14), "Amsterdam", null);
+        Persoon annalouise = adm.addPersoon(Geslacht.VROUW, new String[]{"Annalouise", "Isabel", "Teuntje"}, "Vuiter", "de",
+                new GregorianCalendar(1902, Calendar.OCTOBER, 1), "Amsterdam", null);
+        Gezin ferdinandEnAnnalouise = adm.addHuwelijk(ferdinand, annalouise,
+                new GregorianCalendar(1921, Calendar.MAY, 5));
+        Persoon louise = adm.addPersoon(Geslacht.VROUW, new String[]{"Louise", "Isabel", "Helene"}, "Vuiter", "de",
+                new GregorianCalendar(1927, Calendar.JANUARY, 15), "Amsterdam", ferdinandEnAnnalouise);
+        Gezin louiseAlleen = adm.addOngehuwdGezin(louise, null);
+        Persoon mary = adm.addPersoon(Geslacht.VROUW, new String[]{"mary"}, "Vuiter",
+                "de", new GregorianCalendar(1943, Calendar.MAY, 25), "Rotterdam", louiseAlleen);
+        Gezin gijsEnMary = adm.addOngehuwdGezin(gijs, mary);
+        Persoon jaron = adm.addPersoon(Geslacht.MAN, new String[]{"Jaron"}, "Swinkels",
+                "", new GregorianCalendar(1962, Calendar.JULY, 22), "Velp", gijsEnMary);
+        System.out.println("8 psuedo personen aangemaakt met relatie naar elkaar");
+    }
+    
+    void showTree(){
+        int nr = 0;
+        while(nr < 1){
+            nr = readInt("persoons nummer");
+            if(nr<1)continue;//quit if less then 1
+            Persoon p = controller.getAdministratie().getPersoon(nr);
+            System.out.println(p.stamboomAlsString());
+        }
+    }
+    
+    void loadFile(){
+        String filename = null;
+        while(filename==null){
+            filename = readString("wat is de bestandsnaam");
+            
+            File f = new File(filename);
+            if(!f.isFile() || !f.canRead()) continue;//file doesn't exist or can not be read
+            
+            try
+            {
+                //load the file
+                controller.deserialize(f);
+            }catch(Exception e){
+                if(readString("Fout tijdens lezen, opnieuw proberen?[Y/N]").equalsIgnoreCase("Y")){
+                    continue;//retry
+                }else{
+                    break;//quit
+                }
+            }
+        }
+    }
+    
+    void saveFile(){
+        String filename = null;
+        while(filename==null){
+            filename = readString("wat is de bestandsnaam");
+            File f;
+            try 
+            {
+                f = new File(filename);
+            }catch(Exception ex){
+                filename = null;
+                continue;
+            }
+            try
+            {
+                //save the file
+                controller.serialize(f);
+            }catch(Exception e){
+                if(readString("Fout tijdens opslaan, opnieuw proberen?[Y/N]").equalsIgnoreCase("Y")){
+                    continue;//retry
+                }else{
+                    break;//quit
+                }
+            }
+        }
+    }
+    
+    
+    
     void invoerNieuwePersoon() {
         Geslacht geslacht = null;
         while (geslacht == null) {

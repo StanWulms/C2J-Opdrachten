@@ -3,7 +3,7 @@ package stamboom.domain;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Administratie {
+public class Administratie implements java.io.Serializable{
 
     //************************datavelden*************************************
     private int nextGezinsNr;
