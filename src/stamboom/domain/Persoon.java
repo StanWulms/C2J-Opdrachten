@@ -1,3 +1,4 @@
+/*Bijgewerkt door Rick Rongen*/
 package stamboom.domain;
 
 import java.util.ArrayList;
