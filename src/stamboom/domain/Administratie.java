@@ -345,8 +345,13 @@ public class Administratie implements java.io.Serializable{
      */
     public Gezin getGezin(int gezinsNr) {
         // aanname: er worden geen gezinnen verwijderd
-        if (gezinnen != null && 1 <= gezinsNr && 1 <= gezinnen.size()) {
-            return gezinnen.get(gezinsNr - 1);
+        if (gezinnen != null ) {
+            //return gezinnen.stream().filter((g)->g.getNr() == gezinsNr).findFirst().get();
+            for(Gezin g : gezinnen){
+                if(g.getNr()==gezinsNr){
+                    return g;
+                }
+            }
         }
         return null;
     }
