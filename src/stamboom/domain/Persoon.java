@@ -1,11 +1,15 @@
 /*Bijgewerkt door Rick Rongen*/
 package stamboom.domain;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import stamboom.util.StringUtilities;
 
 public class Persoon implements java.io.Serializable {
@@ -19,8 +23,14 @@ public class Persoon implements java.io.Serializable {
     private final String gebPlaats;
     private Gezin ouderlijkGezin;
     private final List<Gezin> alsOuderBetrokkenIn;
+    private transient ObservableList<Gezin> oAlsOuderBetrokkenIn;
     private final Geslacht geslacht;
 
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+        ois.defaultReadObject();
+        oAlsOuderBetrokkenIn = FXCollections.observableList(alsOuderBetrokkenIn);
+    }
+    
     // ********constructoren***********************************
     /**
      * er wordt een persoon gecreeerd met persoonsnummer persNr en met als
@@ -48,6 +58,7 @@ public class Persoon implements java.io.Serializable {
         geslacht = g;
         this.ouderlijkGezin = ouderlijkGezin;
         alsOuderBetrokkenIn = new ArrayList<>();
+        oAlsOuderBetrokkenIn = FXCollections.observableList(alsOuderBetrokkenIn);
     }
 
     // ********methoden****************************************
@@ -219,7 +230,7 @@ public class Persoon implements java.io.Serializable {
      */
     void wordtOuderIn(Gezin g) {
         if (!alsOuderBetrokkenIn.contains(g)) {
-            alsOuderBetrokkenIn.add(g);
+            oAlsOuderBetrokkenIn.add(g);
         }
     }
 
@@ -365,5 +376,9 @@ public class Persoon implements java.io.Serializable {
             builder.append(p.getPersoonsgegevens()).append(System.lineSeparator());
         }
         return builder.toString();
+    }
+    
+    public ObservableList<Gezin> getOAlsOuderBetrokkenIn(){
+        return (ObservableList<Gezin>) FXCollections.unmodifiableObservableList(oAlsOuderBetrokkenIn);
     }
 }

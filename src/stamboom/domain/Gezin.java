@@ -1,6 +1,8 @@
 /*Bijgewerkt door Rick Rongen*/
 package stamboom.domain;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -15,6 +17,13 @@ public class Gezin implements java.io.Serializable{
     private final Persoon ouder1;
     private final Persoon ouder2;
     private final List<Persoon> kinderen;
+    private transient ObservableList<Persoon> oKinderen;
+    
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+        ois.defaultReadObject();
+        oKinderen = FXCollections.observableList(kinderen);
+    }
+    
     /**
      * kan onbekend zijn (dan is het een ongehuwd gezin):
      */
@@ -70,6 +79,7 @@ public class Gezin implements java.io.Serializable{
         this.scheidingsdatum = null;
         ouder1.wordtOuderIn(this);
         if(ouder2 != null) ouder2.wordtOuderIn(this);
+        oKinderen = FXCollections.observableList(kinderen);
     }
 
     // ********methoden*****************************************
@@ -209,7 +219,7 @@ public class Gezin implements java.io.Serializable{
      */
     void breidUitMet(Persoon kind) {
         if (!kinderen.contains(kind) && !this.isFamilieVan(kind)) {
-            kinderen.add(kind);
+            oKinderen.add(kind);
         }
     }
 
@@ -276,5 +286,9 @@ public class Gezin implements java.io.Serializable{
         if(this.scheidingsdatum == null) return false;
         if(datum.after(this.scheidingsdatum)) return true;
         return false;
+    }
+    
+    public ObservableList<Persoon> getOKinderen(){
+        return (ObservableList<Persoon>) FXCollections.unmodifiableObservableList(oKinderen);
     }
 }

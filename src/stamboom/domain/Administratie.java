@@ -1,8 +1,12 @@
 /*Bijgewerkt door Rick Rongen*/
 package stamboom.domain;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Administratie implements java.io.Serializable{
 
@@ -11,7 +15,15 @@ public class Administratie implements java.io.Serializable{
     private int nextPersNr;
     private final List<Persoon> personen;
     private final List<Gezin> gezinnen;
+    private transient ObservableList<Persoon> oPersonen;
+    private transient ObservableList<Gezin> oGezinnen;
 
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+        ois.defaultReadObject();
+        oPersonen = FXCollections.observableList(personen);
+        oGezinnen = FXCollections.observableList(gezinnen);
+    }
+    
     //***********************constructoren***********************************
     /**
      * er wordt een lege administratie aangemaakt.
@@ -23,6 +35,8 @@ public class Administratie implements java.io.Serializable{
         nextPersNr = 1;
         this.personen = new ArrayList<>();
         this.gezinnen = new ArrayList<>();
+        oPersonen = FXCollections.observableList(personen);
+        oGezinnen = FXCollections.observableList(gezinnen);
     }
 
     //**********************methoden****************************************
@@ -88,7 +102,8 @@ public class Administratie implements java.io.Serializable{
             //Calendar gebdat, String gebplaats, Geslacht g, Gezin ouderlijkGezin
         Persoon p = new Persoon(nextPersNr, vnamen, anaam, tvoegsel, gebdat, gebplaats, geslacht, ouderlijkGezin);
         if(ouderlijkGezin != null) ouderlijkGezin.breidUitMet(p);
-        personen.add(p);
+//        personen.add(p);
+        oPersonen.add(p);
         nextPersNr++;
         return p;
     }
@@ -132,7 +147,8 @@ public class Administratie implements java.io.Serializable{
 
         Gezin gezin = new Gezin(nextGezinsNr, ouder1, ouder2);
         nextGezinsNr++;
-        gezinnen.add(gezin);
+ //       gezinnen.add(gezin);
+        oGezinnen.add(gezin);
 
         ouder1.wordtOuderIn(gezin);
         if (ouder2 != null) {
@@ -354,5 +370,13 @@ public class Administratie implements java.io.Serializable{
             }
         }
         return null;
+    }
+    
+    public ObservableList<Persoon> getOPersonen(){
+        return (ObservableList<Persoon>) FXCollections.unmodifiableObservableList(oPersonen);
+    }
+    
+    public ObservableList<Gezin> getOGezinnen(){
+        return (ObservableList<Gezin>) FXCollections.unmodifiableObservableList(oGezinnen);
     }
 }
